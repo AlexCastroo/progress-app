@@ -2,77 +2,121 @@ import { useEffect, useState } from "react";
 import CardTask from "../Components/CardTask";
 import AppLayout from "../Layouts/AppLayout";
 import Button from '@mui/material/Button';
-import { Create } from "@mui/icons-material";
-import CreateTask from "../Components/CreateTask";
 import * as React from 'react';
-import Box from '@mui/material/Box';
 import TextField from '@mui/material/TextField';
-import PlaylistAddIcon from '@mui/icons-material/PlaylistAdd';
+import axios from "axios";
+import { useForm } from '@inertiajs/react'
+import InputLabel from '@mui/material/InputLabel';
+import MenuItem from '@mui/material/MenuItem';
+import FormControl from '@mui/material/FormControl';
+import Select from '@mui/material/Select';
 
 export default function Home({...props}) {
 
     const initialTask = {
-        id: "",
         title: "",
+        category: "",
+        status: "",
         description: "",
     }
 
     const initialTaskList = {
         tasks: [],
     }
-    const [name, setName] = useState(props.name);
+
+    const MenuOptions = {
+        DEVELOP: 'develop',
+        DESIGN: 'design',
+        ORGANIZATION: 'organization',
+        BRAINS: 'brains',
+      };
+
+    const statusOptions = {
+        PENDING: 'pending',
+        INPROGRESS: 'in-progress',
+        COMPLETED: 'completed',
+    };
+    
     const [tasks, setTasks] = useState([]);
-    const [task, setTask] = useState(initialTask); // Formulario de task
+    const [task, setTask] = useState(initialTask);
     const [editMode, setEditMode] = useState(false);
 
-    const handleClick = () => {
-        setName((prev) => prev === "John Doe" ? "Jane" : "John Doe");
-        console.log(name);
+    // Task form handling
+    const { data, setData, post, get, processing, errors, reset } = useForm({
+        title: '',
+        category: '',
+        status: '',
+        description: '',
+      })
+      
+    function submit(e) {
+        e.preventDefault()
+        // Peticion POST a la 
+        post(route('task.store'), {
+            preserveScroll: true,
+            onSuccess: () => {
+                reset('title', 'category', 'status', 'description'),
+                // Renderizamos la card en el front
+                fetchTasks();
+            },
+            onError: (errors) => {
+                console.log("Error Creating Task", errors)
+            },
+        });
+        console.log(data);
     }
 
-    const handleCreateTask = () => {
-        console.log("Creating task...");
-        setTasks((e) => [...tasks, task]);
-        // Limpiamos el formulario
-        setTask(initialTask);
-        console.log(tasks);
-    }
-
-    const handleDeleteTask = (taskTitle) => {
-        console.log("Deleting task...", taskTitle);
-        setTasks((prevTasks) => prevTasks.filter((task) => task.title !== taskTitle));
+     // DELETE task from CardTask
+     const handleDeleteTask = (task) => {
+        console.log("Deleting task...", task.id);
+        axios.delete(`/tasks/${task.id}`)
+            .then(response => {
+                console.log("Task Deleted", response.data);
+                fetchTasks();
+            })
+            .catch(error => {
+                console.log("Error Deleting Task", error);
+            }); 
     };
 
+    // UPDATE task from Task form
     const handleEditTask = (task) => {
         if (editMode) 
         {
-            console.log("Updating task...", task);
-            setTasks((prevTasks) => prevTasks.map((t) => t.id === task.id ? { ...t, ...task } : t));
-            setEditMode(false);
-            setTask(initialTask);
+            axios.put(`/tasks/${task.id}`, data)
+                .then(response => {
+                    console.log("Task Updated", response.data);
+                    fetchTasks();
+                })
+                .catch(error => {
+                    console.log("Error Updating Task", error);
+                }
+            );
         } 
         else 
         {
-            console.log("Editing task...", task);
             setTask(task);
             setEditMode(true);
         }
     };
 
-    const [user, setUser] = useState({});
+    // Task listing
+    const fetchTasks = () => {
+        axios.get(route('task.index'))
+            .then(response => {
+                console.log("Tasks Fetched", response.data);
+                setTasks(response.data);
+            })
+            .catch(error => {
+                console.log("Error Fetching Tasks", error);
+            });
+
+    };
+
 
     useEffect(() => {
-        const storedUser = localStorage.getItem('user');
-        if (storedUser) {
-        setUser(JSON.parse(storedUser));
-        }
+        fetchTasks();   
     }, []);
-
-    useEffect(() => {
-        localStorage.setItem('user', JSON.stringify(user));
-    }, [user]);
-
-
 
     return (
         <AppLayout>
@@ -89,8 +133,7 @@ export default function Home({...props}) {
                     {tasks.map((task, index) => (
                         <CardTask 
                             key={index} 
-                            task={task} 
-                            user={name} 
+                            task={task}
                             deleteTask={handleDeleteTask}
                             updateTask={handleEditTask}/>
                     ))}
@@ -99,37 +142,68 @@ export default function Home({...props}) {
                 <h3 class="text-lg font-bold text-slate-700">
                     Manage task
                     </h3>
+                    {/* ERRORS */}
+                    {errors.id && <div>{errors.id}</div>}
+                    {errors.title && <div>{errors.title}</div>}
+                    {errors.descripcion && <div>{errors.descripcion}</div>}
+
                     {/* formulario para crear una task */}
-                    <form>
-                        <div class="mb-2">
-                            <TextField
-                                id="id"
-                                name="id"
-                                label="Id"
-                                value={task.id}
-                                onChange={(e) => setTask({...task, id: e.target.value})}
-                                variant="standard"
-                                fullWidth
-                            />
-                            </div>
+                    <form onSubmit={submit}>
                         <div class="mb-2">
                             <TextField
                                 id="title"
                                 name="title"
                                 label="Title"
-                                value={task.title}
-                                onChange={(e) => setTask({...task, title: e.target.value})}
+                                value={data.title || task.title}
+                                onChange={e => setData('title', e.target.value)}
                                 variant="standard"
                                 fullWidth
                             />
+                            </div>
+                        <div class="flex justify-between mb-2">
+                        <FormControl variant="standard" sx={{ minWidth: '48%' }}>
+                            <InputLabel id="category-label">Category</InputLabel>
+                                <Select
+                                    labelId="category-label"
+                                    id="category"
+                                    value={data.category || task.category}
+                                    label="Category"
+                                    onChange={e => setData('category', e.target.value)}
+                                    >
+                                        <MenuItem value="">
+                                            <em>None</em>
+                                        </MenuItem>
+                                        <MenuItem value={MenuOptions.DEVELOP}>Develop</MenuItem>
+                                        <MenuItem value={MenuOptions.DESIGN}>Design</MenuItem>
+                                        <MenuItem value={MenuOptions.ORGANIZATION}>Organization</MenuItem>
+                                        <MenuItem value={MenuOptions.BRAINS}>Brains</MenuItem>
+                                </Select>
+                        </FormControl>
+                        <FormControl variant="standard" sx={{ minWidth: '48%' }}>
+                            <InputLabel id="status-label">Status</InputLabel>
+                                <Select
+                                    labelId="status-label"
+                                    id="status"
+                                    value={data.status || task.status}
+                                    label="Status"
+                                    onChange={e => setData('status', e.target.value)}
+                                    >
+                                        <MenuItem value="">
+                                            <em>None</em>
+                                        </MenuItem>
+                                        <MenuItem value={statusOptions.PENDING}>Pending</MenuItem>
+                                        <MenuItem value={statusOptions.INPROGRESS}>In progress</MenuItem>
+                                        <MenuItem value={statusOptions.COMPLETED}>Completed</MenuItem>
+                                </Select>
+                        </FormControl>
                             </div>
                         <div class="mb-8">
                             <TextField
                                 id="title"
                                 name="description"
                                 label="Description"
-                                value={task.description}
-                                onChange={(e) => setTask({...task, description: e.target.value})}
+                                value={data.description || task.description}
+                                onChange={e => setData('description', e.target.value)}
                                 variant="standard"
                                 fullWidth
                             />
@@ -142,16 +216,14 @@ export default function Home({...props}) {
                                     </Button>
                                     <Button onClick={(e) => {
                                         setEditMode(false);
-                                        setTask(initialTask)
+                                        setTask(initialTask);
                                         }} 
                                         variant="outlined" color="error">
                                     Cancel
                                     </Button>
                                     </>
                                 ) : (
-                                    <PlaylistAddIcon 
-                                        className="h-12 w-12 p-2 text-slate-400 bg-slate-200 rounded-full"
-                                    onClick={handleCreateTask}  />
+                                    <button type="submit" class="bg-slate-700 text-white p-2 rounded-lg">Create</button>
                                 )
                             }
 
