@@ -7,12 +7,17 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import KeyboardDoubleArrowRightIcon from '@mui/icons-material/KeyboardDoubleArrowRight';
 import { Chip } from '@mui/material';
+import moment from 'moment';
+
+// Componentes propios
+//import CheckToggle from './CheckToggle';
 
 export default function CardTask ({...props}) {
 
     const [dropDown, setDropDown] = useState(true);
-
     const task = props.task;
+
+    //
     return (
         
         <div

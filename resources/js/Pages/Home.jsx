@@ -10,6 +10,7 @@ import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
+import moment from "moment";
 
 export default function Home({...props}) {
 
@@ -96,6 +97,7 @@ export default function Home({...props}) {
         else 
         {
             setTask(task);
+            setData(task);
             setEditMode(true);
         }
     };
@@ -113,16 +115,25 @@ export default function Home({...props}) {
 
     };
 
-
+    const date = new Date();
+    const [time, setTime] = useState(moment(date).format('hh:mm:ss'));
+    
     useEffect(() => {
-        fetchTasks();   
+        const interval = setInterval(() => {
+            setTime(moment(new Date()).format('hh:mm:ss'));
+        }, 1000);
+
+        return () => clearInterval(interval);
     }, []);
+    
+    
 
     return (
         <AppLayout>
         <div>
             <h1 class="text-2xl font-bold text-slate-900">Hello, {name}</h1>
             <h5 class="text-sm italic text-slate-500">This is your own second Brain</h5>
+            {time}
         </div>
         <div class="grid grid-cols-2 gap-10">
             <div class="col-span-1 p-4 h-auto bg-slate-400 bg-opacity-20 border border-gray-200 rounded-lg shadow">
