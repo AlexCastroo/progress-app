@@ -9,8 +9,9 @@ import Clock from '../Components/Clock';
 
 export default function Home( props ) {
 
-    const [tasks, setTasks] = useState(props.taskList);
-
+    const [projects, setProjects] = useState(props.projects);
+    const [tasks, setTasks] = useState(props.tasks);
+    console.log(props);
     // Task listing
     const fetchTasks = () => {
         axios.get(route('getTasksList'))
@@ -27,7 +28,15 @@ export default function Home( props ) {
     return (
         <AppLayout>
         <div>
-            <h1 class="text-2xl font-bold text-slate-900">Hello, {name}</h1>
+            <h1 class="text-2xl font-bold text-slate-900">Projects</h1>
+            <div class="grid grid-cols-3 gap-4">
+                {projects.map((project, index) => (
+                    <div key={index} class="p-4 bg-slate-400 bg-opacity-20 border border-gray-200 rounded-lg shadow">
+                        <h2 class="text-lg font-bold text-slate-700">{project.name}</h2>
+                        <p class="text-sm text-slate-500">{project.description}</p>
+                    </div>
+                ))}
+            </div>
             <h5 class="text-sm italic text-slate-500">This is your own second Brain</h5>
             <Clock />
         </div>

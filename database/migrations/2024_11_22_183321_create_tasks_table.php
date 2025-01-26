@@ -18,6 +18,9 @@ return new class extends Migration
             $table->string('status')->nullable();
             $table->text('description')->nullable();
             $table->timestamps();
+
+            // Relation with a project
+            // $tabel->foreign('project_id')->references('id')->on('projects')->onDelete('cascade');
         });
     }
 
