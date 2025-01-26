@@ -51,14 +51,12 @@ export default function TaskForm( props ) {
             preserveScroll: true,
             onSuccess: () => {
                 reset('title', 'category', 'status', 'description'),
-                // Renderizamos la card en el front
                 props.updateList();
             },
             onError: (errors) => {
                 console.log("Error Creating Task", errors)
             },
         });
-        console.log(data);
     }
 
     return (

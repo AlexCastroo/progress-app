@@ -22,9 +22,26 @@ import Select from '@mui/material/Select';
 //import CheckToggle from './CheckToggle';
 
 export default function CardTask ( props ) {
-
+    const MenuOptions = {
+        DEVELOP: 'develop',
+        DESIGN: 'design',
+        ORGANIZATION: 'organization',
+        BRAINS: 'brains',
+    };
+    const statusOptions = {
+        PENDING: 'pending',
+        INPROGRESS: 'in-progress',
+        COMPLETED: 'completed',
+    };
     const [dropDown, setDropDown] = useState(true);
     const [task, setTask] = useState(props.task);
+    const [editMode, setEditMode] = useState(false);
+    const { data, setData, post, get, processing, errors, reset } = useForm({
+        title: '',
+        category: '',
+        status: '',
+        description: '',
+    })
 
     // Delete Task
     const handleDeleteTask = (task) => {
@@ -39,42 +56,15 @@ export default function CardTask ( props ) {
             });
     };
 
-    // Update Task
-    const [editMode, setEditMode] = useState(false);
-
-
-    const MenuOptions = {
-        DEVELOP: 'develop',
-        DESIGN: 'design',
-        ORGANIZATION: 'organization',
-        BRAINS: 'brains',
-        };
-
-    const statusOptions = {
-        PENDING: 'pending',
-        INPROGRESS: 'in-progress',
-        COMPLETED: 'completed',
-    };
-
-    const { data, setData, post, get, processing, errors, reset } = useForm({
-        title: '',
-        category: '',
-        status: '',
-        description: '',
-        })
-
     // HANDLE task to edit
     const handleEditTask = (task) => {
         setEditMode(true);
-        setData(
-            {
-                title: task.title,
-                category: task.category,
-                status: task.status,
-                description: task.description,
-            }
-        );
-
+        setData({
+            title: task.title,
+            category: task.category,
+            status: task.status,
+            description: task.description,
+        });
     };
 
 
@@ -103,16 +93,17 @@ export default function CardTask ( props ) {
 
     };
 
-   useEffect(() => {
-    if (!editMode) {
-        setData({
-            title: task.title,
-            category: task.category,
-            status: task.status,
-            description: task.description,
-        });
-    }
-}, [editMode, task]);
+    // Aplica el renderizado automatico al editar la tarea
+    useEffect(() => {
+        if (!editMode) {
+            setData({
+                title: task.title,
+                category: task.category,
+                status: task.status,
+                description: task.description,
+            });
+        }
+    }, [editMode, task]);
 
     return (
         <div
