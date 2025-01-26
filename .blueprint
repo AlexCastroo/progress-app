@@ -1,0 +1,59 @@
+created:
+    - app/Http/Controllers/PlayerController.php
+    - app/Http/Controllers/CourtController.php
+    - app/Http/Controllers/PadelMatchController.php
+    - app/Http/Controllers/TeamController.php
+    - app/Http/Controllers/MatchRegistrationController.php
+    - database/factories/PlayerFactory.php
+    - database/factories/CourtFactory.php
+    - database/factories/PadelMatchFactory.php
+    - database/factories/TeamFactory.php
+    - database/factories/MatchRegistrationFactory.php
+    - database/migrations/2025_01_02_231037_create_players_table.php
+    - database/migrations/2025_01_02_231038_create_courts_table.php
+    - database/migrations/2025_01_02_231039_create_padel_matches_table.php
+    - database/migrations/2025_01_02_231040_create_teams_table.php
+    - database/migrations/2025_01_02_231041_create_match_registrations_table.php
+    - database/migrations/2025_01_02_231042_create_player_team_table.php
+    - database/migrations/2025_01_02_231043_create_match_registration_team_table.php
+    - app/Models/Player.php
+    - app/Models/Court.php
+    - app/Models/PadelMatch.php
+    - app/Models/Team.php
+    - app/Models/MatchRegistration.php
+    - database/seeders/PlayerSeeder.php
+    - database/seeders/CourtSeeder.php
+    - database/seeders/PadelMatchSeeder.php
+    - database/seeders/TeamSeeder.php
+    - database/seeders/MatchRegistrationSeeder.php
+    - tests/Feature/Http/Controllers/PlayerControllerTest.php
+    - tests/Feature/Http/Controllers/CourtControllerTest.php
+    - tests/Feature/Http/Controllers/PadelMatchControllerTest.php
+    - tests/Feature/Http/Controllers/TeamControllerTest.php
+    - tests/Feature/Http/Controllers/MatchRegistrationControllerTest.php
+    - resources/views/padelmatch/index.blade.php
+    - resources/views/padelmatch/show.blade.php
+updated:
+    - routes/web.php
+skipped:
+    - resources/views/player/index.blade.php
+    - resources/views/player/show.blade.php
+    - resources/views/court/index.blade.php
+    - resources/views/court/show.blade.php
+    - resources/views/team/index.blade.php
+    - resources/views/team/show.blade.php
+    - resources/views/match-registration/index.blade.php
+    - resources/views/match-registration/show.blade.php
+models:
+    Task: { title: string, category: 'string nullable', status: 'string nullable', description: 'text nullable' }
+    User: { name: string, email: string, email_verified_at: 'timestamp nullable', password: string, remember_token: 'string:100 nullable' }
+    Conference: { name: string, description: string, start_date: datetime, end_date: datetime, status: string, region: string, venue_id: 'unsignedInteger nullable', relationships: { belongsTo: Venue, belongsToMany: 'Speaker, Talk' } }
+    Venue: { name: string, address: string, city: string, state: string, country: string, postal_code: string, relationships: { hasMany: Conference } }
+    Speaker: { name: string, email: string, bio: text, twitter_handle: string, relationships: { belongsToMany: Conference } }
+    Talk: { title: string, abstract: text, start_time: datetime, speaker_id: unsignedInteger, relationships: { belongsTo: Speaker, belongsToMany: Conference } }
+    Player: { name: string, surname: string, alias: string, category: integer, email: string, tlf: string, relationships: { belongsToMany: Team } }
+    Court: { name: string, location: string, relationships: { hasMany: PadelMatch } }
+    Match: { date: datetime, time: datetime, court_id: unsignedInteger, relationships: { belongsTo: Court, hasMany: MatchRegistration } }
+    Team: { name: string, player1_id: unsignedInteger, player2_id: unsignedInteger, relationships: { belongsToMany: Player, hasMany: MatchRegistration } }
+    MatchRegistration: { match_id: unsignedInteger, team_id: unsignedInteger, relationships: { belongsTo: PadelMatch, belongsToMany: Team } }
+    PadelMatch: { date: datetime, time: datetime, court_id: unsignedInteger, relationships: { belongsTo: Court, hasMany: MatchRegistration } }
