@@ -1,0 +1,161 @@
+models:
+  Player:
+    name: string
+    surname: string
+    alias: string
+    category: integer
+    email: string
+    tlf: string
+    relationships:
+      belongsToMany: Team
+
+  Court:
+    name: string
+    location: string
+    relationships:
+      hasMany: PadelMatch
+
+  PadelMatch:
+    date: datetime
+    time: datetime
+    court_id: unsignedInteger
+    relationships:
+      belongsTo: Court
+      hasMany: MatchRegistration
+
+  Team:
+    name: string
+    player1_id: unsignedInteger
+    player2_id: unsignedInteger
+    relationships:
+      belongsToMany: Player
+      hasMany: MatchRegistration
+
+  MatchRegistration:
+    match_id: unsignedInteger
+    team_id: unsignedInteger
+    relationships:
+      belongsTo: PadelMatch
+      belongsToMany: Team
+
+controllers:
+  Player:
+    index:
+      query: all
+      render: player.index with:players
+
+    store:
+      validate: name, surname, alias, category, email, tlf
+      save: player
+      flash: player.name
+      redirect: player.index
+
+    show:
+      render: player.show with:player
+
+    update:
+      validate: name, surname, alias, category, email, tlf
+      update: player
+      flash: player.name
+      redirect: player.index
+
+    destroy:
+      delete: player
+      flash: player.name
+      redirect: player.index
+  
+  Court:
+    index:
+      query: all
+      render: court.index with:courts
+
+    store:
+      validate: name, location
+      save: court
+      flash: court.name
+      redirect: court.index
+
+    show:
+      render: court.show with:court
+
+    update:
+      validate: name, location
+      update: court
+      flash: court.name
+      redirect: court.index
+
+    destroy:
+      delete: court
+      flash: court.name
+      redirect: court.index
+  
+  PadelMatch:
+    index:
+      query: all
+      render: padelmatch.index with:matches
+
+    store:
+      validate: date, time, court_id
+      save: padelmatch
+      flash: padelmatch.id
+      redirect: padelmatch.index
+
+    show:
+      render: padelmatch.show with:match
+
+    update:
+      validate: date, time, court_id
+      update: padelmatch
+      flash: padelmatch.id
+      redirect: padelmatch.index
+
+    destroy:
+      delete: padelmatch
+      flash: padelmatch.id
+      redirect: padelmatch.index
+
+  Team:
+    index:
+      query: all
+      render: team.index with:teams
+
+    store:
+      validate: name, player1_id, player2_id
+      save: team
+      flash: team.name
+      redirect: team.index
+
+    show:
+      render: team.show with:team
+
+    update:
+      validate: name, player1_id, player2_id
+      update: team
+      flash: team.name
+      redirect: team.index
+
+    destroy:
+      delete: team
+      flash: team.name
+      redirect: team.index
+  
+  MatchRegistration:
+    index:
+      query: all
+      render: match-registration.index with:matchRegistrations
+
+    store:
+      validate: match_id, team_id
+      save: matchRegistration
+      flash: matchRegistration.id
+      redirect: match-registration.index
+
+    show:
+      render: match-registration.show with:matchRegistration
+
+    destroy:
+      delete: matchRegistration
+      flash: matchRegistration.id
+      redirect: match-registration.index
+
+seeders: Player, Court, PadelMatch, Team, MatchRegistration

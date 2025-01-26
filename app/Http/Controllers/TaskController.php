@@ -15,7 +15,7 @@ class TaskController extends Controller
     public function index(Request $request)
     {
         $taskList = Task::all();
-        return $taskList;    
+        return Inertia::render('Home', ['taskList' => $taskList]);
     }
 
     /**
@@ -34,7 +34,7 @@ class TaskController extends Controller
         // Creamos la tarea con Eloquent
         Task::create($request->all());
         // Redireccionamos a la vista principal con un mensaje
-        return to_route('home')->with('success', 'Task created successfully.');       
+        return redirect()->route('task.index')->with('message', 'Task created successfully.');
     }
 
     /**
@@ -61,10 +61,6 @@ class TaskController extends Controller
         try {
             // Actualizar la tarea
             $task->update($request->all());
-            return response()->json([
-                'message' => 'Task updated successfully.',
-                'task' => $task
-            ], 200);  // Responde con éxito (código HTTP 200)
         } catch (\Exception $e) {
             // Manejo de errores
             return response()->json([
@@ -82,16 +78,18 @@ class TaskController extends Controller
         try {
             // Eliminar la tarea
             $task->delete();
-            return response()->json([
-                'message' => 'Task deleted successfully.'
-            ], 200);  // Responde con éxito (código HTTP 200)
         } catch (\Exception $e) {
-            // Manejo de errores
             return response()->json([
                 'error' => 'Failed to delete task.',
                 'message' => $e->getMessage()
             ], 500);  // Responde con error (código HTTP 500)
         }
+    }
+
+    public function getTasksList()
+    {
+        $taskList = Task::all();
+        return response()->json($taskList);
     }
 
 
