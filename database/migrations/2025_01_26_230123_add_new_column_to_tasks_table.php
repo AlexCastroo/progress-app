@@ -11,17 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('tasks', function (Blueprint $table) {
-            $table->id();
-            $table->string('title');
-            $table->string('category')->nullable();
-            $table->string('status')->nullable();
-            $table->text('description')->nullable();
+        Schema::table('tasks', function (Blueprint $table) {
+            $table->unsignedBigInteger('project_id')->nullable()->after('id');
             $table->foreign('project_id')->references('id')->on('projects')->onDelete('cascade');
-            $table->timestamps();
-
-            // Relation with a project
-
         });
     }
 
@@ -30,6 +22,9 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('tasks');
+        Schema::table('tasks', function (Blueprint $table) {
+            $table->dropForeign(['project_id']);
+            $table->dropColumn('project_id');
+        });
     }
 };

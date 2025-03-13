@@ -6,6 +6,7 @@ use App\Models\Task;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use App\Http\Requests\Task\StoreRequest;
+use App\Models\Project;
 
 class TaskController extends Controller
 {
@@ -32,9 +33,10 @@ class TaskController extends Controller
     public function store(Request $request)
     {
         // Creamos la tarea con Eloquent
+        // dd($request->all());
         Task::create($request->all());
         // Redireccionamos a la vista principal con un mensaje
-        return redirect()->route('task.index')->with('message', 'Task created successfully.');
+        return;
     }
 
     /**
@@ -86,9 +88,9 @@ class TaskController extends Controller
         }
     }
 
-    public function getTasksList()
+    public function getTasksList(Request $request, Project $project)
     {
-        $taskList = Task::all();
+        $taskList = $project->tasks()->get();
         return response()->json($taskList);
     }
 

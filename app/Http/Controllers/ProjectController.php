@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\Project;
+use App\Models\Task;
 use App\Http\Requests\StoreProjectRequest;
 use App\Http\Requests\UpdateProjectRequest;
+use Inertia\Inertia;
 
 class ProjectController extends Controller
 {
@@ -14,8 +16,13 @@ class ProjectController extends Controller
     public function index()
     {
         $listProjects = Project::all();
-        return Inertia::render('Projects/Index', [
-            'projects' => $listProjects
+
+        $motivationalQuotes = json_decode(file_get_contents(resource_path('data/motivational.json')), true);
+        $randomQuote = $motivationalQuotes[array_rand($motivationalQuotes)];
+
+        return Inertia::render('Projects/ProjectList', [
+            'projects' => $listProjects,
+            'motivationalQuote' => $randomQuote
         ]);
     }
 
@@ -32,7 +39,8 @@ class ProjectController extends Controller
      */
     public function store(StoreProjectRequest $request)
     {
-        //
+        $project = Project::create($request->all());
+        return redirect()->route('project.index')->with('success', 'Project created successfully');
     }
 
     /**
@@ -40,7 +48,12 @@ class ProjectController extends Controller
      */
     public function show(Project $project)
     {
-        //
+        $projectTasks = $project->tasks()->get();
+
+        return Inertia::render('Projects/Project', [
+            'project' => $project,
+            'tasks' => $projectTasks
+        ]);
     }
 
     /**
@@ -71,5 +84,42 @@ class ProjectController extends Controller
     {
         $projectList = $project->all();
         return response()->json($projectList);
+    }
+
+    public function projectTasks(Project $project)
+    {
+        $tasks = $project->tasks()->get();
+        return Inertia::render('Projects/ProjectTasks', [
+            'project' => $project,
+            'tasks' => $tasks
+        ]);
+    }
+
+    public function projectStats(Project $project)
+    {
+        $tasks = $project->tasks()->get();
+        $totalTasks = $tasks->count();
+        $completedTasks = $tasks->where('status', 'completed')->count();
+        $pendingTasks = $tasks->where('status', 'pending')->count();
+
+        return Inertia::render('Projects/ProjectStats', [
+            'project' => $project,
+            'totalTasks' => $totalTasks,
+            'completedTasks' => $completedTasks,
+            'pendingTasks' => $pendingTasks
+        ]);
+    }
+
+    public function projectGoals(Project $project)
+    {
+        $tasks = $project->tasks()->get();
+        $completedProjects = $tasks->where('status', 'completed')->count();
+        $pendingProjects = $tasks->where('status', 'pending')->count();
+
+        return Inertia::render('Projects/ProjectGoal', [
+            'project' => $project,
+            'completedProjects' => $completedProjects,
+            'pendingProjects' => $pendingProjects
+        ]);
     }
 }

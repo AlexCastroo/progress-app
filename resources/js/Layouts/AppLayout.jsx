@@ -1,4 +1,13 @@
-export default function AppLayout({ children }) {
+import React from 'react';
+import DashboardList from '@/Components/DashboardList';
+// Grid for dashboard
+import { styled } from '@mui/material/styles';
+import Box from '@mui/material/Box';
+import Paper from '@mui/material/Paper';
+import Grid from '@mui/material/Grid2';
+
+export default function AppLayout({ children, project }) {
+    console.log("App Layout => ", children);
     return (
         <html lang="en" className="h-full">
             <head>
@@ -9,21 +18,33 @@ export default function AppLayout({ children }) {
                 <title>Document</title>
             </head>
             <body className="h-full flex flex-col">
+
                 <header className="bg-slate-800 text-white">
                     <div className="container mx-auto p-4">
                         <h1 className="text-2xl font-bold">My Total App</h1>
                         <h5 className="text-xs font-light">Created by Alex Castro</h5>
                     </div>
                 </header>
-                <main className="container h-auto mx-auto p-4 flex-1">
-                    {children}
-                </main>
+
+                <Grid container spacing={2}>
+
+                    <Grid size={2}>
+                        <DashboardList project={project} />
+                    </Grid>
+                    <Grid size={10}>
+                        { children }
+                    </Grid>
+                    </Grid>
+
+
+
+
             </body>
-            <footer className="absolute bottom-0 w-full bg-slate-800 text-white text-xs font-extralight">
+            {/* <footer className="bottom-0 w-full bg-slate-800 text-white text-xs font-extralight">
                 <div className="container mx-auto p-4">
                     <p>My App &copy; 2024</p>
                 </div>
-            </footer>
+            </footer> */}
         </html>
     )
 }

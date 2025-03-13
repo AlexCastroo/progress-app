@@ -15,4 +15,12 @@ class Task extends Model
         'status',
         'description',
     ];
+
+    public function project()
+    {
+        return $this->belongsTo(Project::class); // Asumiendo que cada tarea pertenece a un proyecto
+    }
+
 }
+
+

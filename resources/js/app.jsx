@@ -1,6 +1,8 @@
 import './bootstrap';
 
-import { createInertiaApp } from '@inertiajs/react'
+//import { createInertiaApp } from '@inertiajs/react'
+import { createInertiaApp } from '@inertiajs/inertia-react';
+
 import { createRoot } from 'react-dom/client'
 import '../css/app.css'
 
@@ -11,7 +13,7 @@ createInertiaApp({
   },
   setup({ el, App, props }) {
     createRoot(el).render(
-      <App {...props} />
+            <App {...props} />
     )
   },
 })

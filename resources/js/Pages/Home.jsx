@@ -1,11 +1,12 @@
 import * as React from 'react';
 import { useEffect, useState } from "react";
-import CardTask from "../Components/CardTask";
+import CardTask from "@/Components/CardTask";
 import AppLayout from "../Layouts/AppLayout";
 import axios from "axios";
 import moment from "moment";
 import TaskForm from '../Components/TaskForm';
 import Clock from '../Components/Clock';
+import ProjectForm from '../Components/ProjectForm';
 
 export default function Home( props ) {
 
@@ -27,6 +28,7 @@ export default function Home( props ) {
 
     return (
         <AppLayout>
+
         <div>
             <h1 class="text-2xl font-bold text-slate-900">Projects</h1>
             <div class="grid grid-cols-3 gap-4">
@@ -40,6 +42,7 @@ export default function Home( props ) {
             <h5 class="text-sm italic text-slate-500">This is your own second Brain</h5>
             <Clock />
         </div>
+        <ProjectForm />
         <div class="grid grid-cols-2 gap-10">
             <div class="col-span-1 p-4 h-auto bg-slate-400 bg-opacity-20 border border-gray-200 rounded-lg shadow">
                 <h3 class="text-lg font-bold text-slate-700">

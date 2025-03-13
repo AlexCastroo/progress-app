@@ -14,5 +14,11 @@ class Project extends Model
         'description',
         'start_date',
         'end_date',
-        'status'];
+        'status'
+    ];
+
+    public function tasks()
+    {
+        return $this->hasMany(Task::class);
+    }
 }
