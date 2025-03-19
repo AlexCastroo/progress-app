@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
 import IconButton from '@mui/material/IconButton';
@@ -8,6 +8,11 @@ import EditIcon from '@mui/icons-material/Edit';
 import SaveIcon from '@mui/icons-material/Save';
 import CloseIcon from '@mui/icons-material/Close';
 import { FaRegEye } from "react-icons/fa";
+import { FaCirclePlay } from "react-icons/fa6";
+import { FaCirclePause } from "react-icons/fa6";
+import { IoCheckmarkDoneCircle } from "react-icons/io5";
+
+import moment from 'moment-timezone';
 
 import KeyboardDoubleArrowRightIcon from '@mui/icons-material/KeyboardDoubleArrowRight';
 import { Chip } from '@mui/material';
@@ -20,10 +25,31 @@ import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
 import '../../css/CardTask.css';
 
-export default function CardTask ( props, showTask ) {
+export default function CardTask ( props, showTask, updateList ) {
+
+    moment.tz('Europe/Madrid');
+
 
     const [dropDown, setDropDown] = useState(true);
     const [task, setTask] = useState(props.task);
+    const [taskTimeLog, setTaskTimeLog] = useState(null);
+    const actionStatusMap = {
+        'start': 'started',
+        'resume': 'started',
+        'pause': 'paused',
+        'finish': 'completed'
+    };
+    const handleTimeTask = (id, action) => {
+        axios.post(route('task.action', { task: id, action: action }))
+            .then(response => {
+                console.log("Task Time", response.data);
+                setTaskTimeLog(actionStatusMap[action] || taskTimeLog);
+                (action == 'finish' || action == 'pause') && props.updateList();
+            })
+            .catch(error => {
+                console.log("Error Task Time", error);
+            });
+    }
 
     return (
         <div
@@ -33,7 +59,6 @@ export default function CardTask ( props, showTask ) {
             <form>
                 {
                     dropDown ? (
-
                         <div>
                             <div class="content-card">
                                    <h5 className="title-card" onClick={() => dropDown === true ? setDropDown(false) : setDropDown(true)}>
@@ -45,6 +70,27 @@ export default function CardTask ( props, showTask ) {
                                     <p className="desc-card">
                                         {task.description}
                                     </p>
+                                    <h3 className="desc-card">
+                                        {moment.utc(task.total_time * 1000).format('HH:mm:ss')}
+                                    </h3>
+                                    {
+                                        taskTimeLog != 'completed' ? (
+                                            taskTimeLog == null && (task.status == 'in-progress' || task.status == 'paused') ? (
+                                                    <FaCirclePlay className='text-green-600' onClick={() => handleTimeTask(task.id, 'start')}/>
+                                            ) : (
+                                                taskTimeLog == 'started' ? (
+                                                    <>
+                                                        <FaCirclePause className='text-red-600' onClick={() => handleTimeTask(task.id, 'pause')}/>
+                                                        <IoCheckmarkDoneCircle className='text-green-600' onClick={() => handleTimeTask(task.id, 'finish')}/>
+                                                    </>
+                                                    ) : ( taskTimeLog == 'paused' ? (
+                                                        <FaCirclePlay className='text-green-600' onClick={() => handleTimeTask(task.id, 'resume')}/>
+                                                    ) : null
+                                                )
+                                            )
+                                        ) : null
+                                    }
+
                                     {/* <Chip className='badge-status' variant='outlined' size='small' label={data.status} color={data.status == 'pending' ? "warning" : (data.status == 'completed' ? "success" : "info")} /> */}
                             </div>
                             <div className="actions-card">

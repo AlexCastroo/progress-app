@@ -21,4 +21,9 @@ class Project extends Model
     {
         return $this->hasMany(Task::class);
     }
+
+    public function sprints()
+    {
+        return $this->hasMany(Sprint::class);
+    }
 }

@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Inertia\Inertia;
 use App\Http\Requests\Task\StoreRequest;
 use App\Models\Project;
+use App\Models\TaskHistory;
 
 class TaskController extends Controller
 {
@@ -17,14 +18,6 @@ class TaskController extends Controller
     {
         $taskList = Task::all();
         return Inertia::render('Home', ['taskList' => $taskList]);
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //return Inertia::render('Tasks/TaskCreate');
     }
 
     /**
@@ -61,8 +54,19 @@ class TaskController extends Controller
     public function update(Request $request, Task $task)
     {
         try {
+
+            TaskHistory::create([
+                'task_id' => $task->id,
+                'changed_at' => now(),
+                'old_status' => $task->status,
+                'new_status' => $request->status
+            ]);
+
             // Actualizar la tarea
             $task->update($request->all());
+
+            // Guardar el historial de cambios
+
         } catch (\Exception $e) {
             // Manejo de errores
             return response()->json([
@@ -78,6 +82,12 @@ class TaskController extends Controller
     public function destroy(Task $task)
     {
         try {
+            TaskHistory::create([
+                'task_id' => $task->id,
+                'changed_at' => now(),
+                'old_status' => $task->status,
+                'new_status' => 'deleted'
+            ]);
             // Eliminar la tarea
             $task->delete();
         } catch (\Exception $e) {
@@ -93,7 +103,4 @@ class TaskController extends Controller
         $taskList = $project->tasks()->get();
         return response()->json($taskList);
     }
-
-
-
 }

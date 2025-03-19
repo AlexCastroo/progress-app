@@ -1,13 +1,15 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import DashboardList from '@/Components/DashboardList';
-// Grid for dashboard
-import { styled } from '@mui/material/styles';
-import Box from '@mui/material/Box';
-import Paper from '@mui/material/Paper';
-import Grid from '@mui/material/Grid2';
+import { Grid } from '@mui/material';
+import { useThemeContext } from '../Theme/ThemeContext'; // Importar el hook useThemeContext
 
-export default function AppLayout({ children, project }) {
-    console.log("App Layout => ", children);
+function AppLayout({ children, project }) {
+    const { toggleTheme } = useThemeContext(); // Obtener la función para cambiar el tema
+
+    useEffect(() => {
+        console.log("App Layout EFECT => ", children);
+    }, [children]);
+
     return (
         <html lang="en" className="h-full">
             <head>
@@ -18,33 +20,33 @@ export default function AppLayout({ children, project }) {
                 <title>Document</title>
             </head>
             <body className="h-full flex flex-col">
+                    <header className="bg-slate-800 text-white">
+                        <div className="container mx-auto p-4 flex justify-between items-center">
+                            <div>
+                                <h1 className="text-2xl font-bold">My Total App</h1>
+                                <h5 className="text-xs font-light">Created by Alex Castro</h5>
+                            </div>
+                            {/* Botón para cambiar el tema */}
+                            <button
+                                onClick={toggleTheme}
+                                className="bg-gray-700 text-white px-4 py-2 rounded focus:outline-none"
+                            >
+                                Toggle Theme
+                            </button>
+                        </div>
+                    </header>
 
-                <header className="bg-slate-800 text-white">
-                    <div className="container mx-auto p-4">
-                        <h1 className="text-2xl font-bold">My Total App</h1>
-                        <h5 className="text-xs font-light">Created by Alex Castro</h5>
-                    </div>
-                </header>
-
-                <Grid container spacing={2}>
-
-                    <Grid size={2}>
-                        <DashboardList project={project} />
+                    <Grid container spacing={2}>
+                        <Grid item xs={2}>
+                            <DashboardList project={project} />
+                        </Grid>
+                        <Grid item xs={10}>
+                            {children}
+                        </Grid>
                     </Grid>
-                    <Grid size={10}>
-                        { children }
-                    </Grid>
-                    </Grid>
-
-
-
-
             </body>
-            {/* <footer className="bottom-0 w-full bg-slate-800 text-white text-xs font-extralight">
-                <div className="container mx-auto p-4">
-                    <p>My App &copy; 2024</p>
-                </div>
-            </footer> */}
         </html>
-    )
+    );
 }
+
+export default React.memo(AppLayout);

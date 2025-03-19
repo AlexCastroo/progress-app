@@ -1,7 +1,6 @@
 import { Edit, TaskSharp } from '@mui/icons-material';
-import React, { useEffect } from 'react'
 import CardTask from "@/Components/CardTask";
-import { useState } from 'react';
+import React, { useEffect, useCallback, useState } from 'react';
 import AppLayout from '@/Layouts/AppLayout';
 import { Inertia } from '@inertiajs/inertia';
 import '../../../css/Project.css';
@@ -34,7 +33,7 @@ export default function Project( props ) {
 
     useEffect(() => {
         setPendingTasks(tasks.filter( task => task.status === 'pending' ));
-        setInProgressTasks(tasks.filter( task => task.status === 'in-progress' ));
+        setInProgressTasks(tasks.filter( task => task.status === 'in-progress' || task.status === 'paused' ));
         //setReviewTasks(tasks.filter( task => task.status === 'review' ));
         setCompletedTasks(tasks.filter( task => task.status === 'completed' ));
         console.log("Tasks Useeffect => ", tasks);
@@ -95,6 +94,7 @@ export default function Project( props ) {
                                         key={task.id}
                                         task={task}
                                         showTask={() => handleTaskPanel(task)}
+                                        updateList={fetchTasks}
                                         />
                                 ))}
                             </div>

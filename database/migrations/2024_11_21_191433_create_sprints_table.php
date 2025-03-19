@@ -11,33 +11,27 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('tasks', function (Blueprint $table) {
+        Schema::create('sprints', function (Blueprint $table) {
             $table->id();
 
             $table->unsignedBigInteger('project_id')->nullable();
             $table->foreign('project_id')->references('id')->on('projects')->onDelete('cascade');
 
-            $table->unsignedBigInteger('user_id')->nullable();
-            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
-
-            $table->unsignedBigInteger('sprint_id')->nullable();
-            $table->foreign('sprint_id')->references('id')->on('sprints')->onDelete('cascade');
-
             $table->string('title');
-            $table->string('category')->nullable();
-            $table->enum('status', ['pending', 'in-progress', 'paused', 'completed'])->default('pending');
             $table->text('description')->nullable();
-            $table->integer('priority')->default(0);
+
+            $table->timestamp('start_date')->nullable();
+            $table->timestamp('end_date')->nullable();
+            $table->integer('total_days')->nullable();
 
             $table->timestamp('start_at')->nullable();
             $table->timestamp('end_at')->nullable();
             $table->integer('total_time')->nullable();
             $table->boolean('is_paused')->default(false);
 
+            $table->enum('status', ['active', 'paused', 'completed', 'archived'])->default('active');
+
             $table->timestamps();
-
-            // Relation with a project
-
         });
     }
 
@@ -46,6 +40,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('tasks');
+        Schema::dropIfExists('sprints');
     }
 };

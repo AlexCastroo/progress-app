@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Factories\Factory;
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Project>
  */
-class ProjectFactory extends Factory
+class SprintFactory extends Factory
 {
     /**
      * Define the model's default state.
@@ -16,11 +16,13 @@ class ProjectFactory extends Factory
      */
     public function definition(): array
     {
+        $startDate = $this->faker->dateTimeBetween('-1 month', 'now');
+        $endDate = $this->faker->dateTimeBetween($startDate, strtotime('+1 month'));
         return [
-            'name' => $this->faker->name,
+            'title' => $this->faker->name,
             'description' => $this->faker->text,
-            'start_date' => $this->faker->dateTimeBetween('2025-01-01', '2025-03-01'),
-            'end_date' => null,
+            'end_at' => null,
+            'is_paused' => $this->faker->boolean,
             'status' => 'active',
         ];
     }
