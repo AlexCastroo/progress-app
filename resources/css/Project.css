@@ -1,0 +1,36 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Pacifico&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Agbalumo&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+.container-project{
+    @apply flex flex-row w-full h-full py-20 px-4 gap-4 items-center justify-start;
+}
+
+.container-kanban{
+    @apply flex flex-row w-2/3 gap-4 items-start justify-end;
+}
+
+.column{
+    @apply flex flex-col w-1/2 h-dvh gap-2 justify-start bg-sky-50 bg-opacity-50 rounded-xl;
+}
+
+.column-kanban{
+    @apply flex flex-col p-2 w-full gap-2 items-center justify-center;
+}
+
+.title-kanban-pending{
+    @apply m-2 text-sm font-light text-orange-200 bg-orange-500 w-fit px-4 rounded-md opacity-80;
+}
+
+.title-kanban-progress{
+    @apply m-2 text-sm font-light text-blue-200 bg-blue-500 w-fit px-4 rounded-md opacity-80;
+}
+
+.title-kanban-completed{
+    @apply m-2 text-sm font-light text-green-200 bg-green-500 w-fit px-4 rounded-md opacity-80;
+}

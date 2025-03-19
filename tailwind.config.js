@@ -8,11 +8,27 @@ export default {
         './resources/**/*.blade.php',
         './resources/**/*.js',
         './resources/**/*.jsx',
+        "./resources/js/theme/**/*.js",
     ],
+    darkMode: "class",
     theme: {
         extend: {
             fontFamily: {
                 sans: ['Figtree', ...defaultTheme.fontFamily.sans],
+            },
+            colors: {
+                primary: "#B497D6",
+                secondary: "#05204A",
+                background: "#E1E2EF",
+                textPrimary: "#02020A",
+                textSecondary: "#05204A",
+                dark: {
+                    primary: "#05204A",
+                    secondary: "#B497D6",
+                    background: "#02020A",
+                    textPrimary: "#E1E2EF",
+                    textSecondary: "#BFACAA",
+                },
             },
         },
     },

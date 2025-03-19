@@ -6,6 +6,8 @@ use App\Models\Task;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use App\Http\Requests\Task\StoreRequest;
+use App\Models\Project;
+use App\Models\TaskHistory;
 
 class TaskController extends Controller
 {
@@ -19,22 +21,15 @@ class TaskController extends Controller
     }
 
     /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //return Inertia::render('Tasks/TaskCreate');
-    }
-
-    /**
      * Store a newly created resource in storage.
      */
     public function store(Request $request)
     {
         // Creamos la tarea con Eloquent
+        // dd($request->all());
         Task::create($request->all());
         // Redireccionamos a la vista principal con un mensaje
-        return redirect()->route('task.index')->with('message', 'Task created successfully.');
+        return;
     }
 
     /**
@@ -59,8 +54,19 @@ class TaskController extends Controller
     public function update(Request $request, Task $task)
     {
         try {
+
+            TaskHistory::create([
+                'task_id' => $task->id,
+                'changed_at' => now(),
+                'old_status' => $task->status,
+                'new_status' => $request->status
+            ]);
+
             // Actualizar la tarea
             $task->update($request->all());
+
+            // Guardar el historial de cambios
+
         } catch (\Exception $e) {
             // Manejo de errores
             return response()->json([
@@ -76,6 +82,12 @@ class TaskController extends Controller
     public function destroy(Task $task)
     {
         try {
+            TaskHistory::create([
+                'task_id' => $task->id,
+                'changed_at' => now(),
+                'old_status' => $task->status,
+                'new_status' => 'deleted'
+            ]);
             // Eliminar la tarea
             $task->delete();
         } catch (\Exception $e) {
@@ -86,12 +98,9 @@ class TaskController extends Controller
         }
     }
 
-    public function getTasksList()
+    public function getTasksList(Request $request, Project $project)
     {
-        $taskList = Task::all();
+        $taskList = $project->tasks()->get();
         return response()->json($taskList);
     }
-
-
-
 }
