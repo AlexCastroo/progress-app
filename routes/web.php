@@ -11,28 +11,34 @@ use App\Http\Controllers\TaskTimeLogController;
 use App\Http\Controllers\SprintController;
 
 
-Route::get('/', [HomeController::class, 'index']);
+Route::get('/', function () {
+    return 'Laravel AUTH API';
+});
 
-Route::post('/tasks', [TaskController::class, 'store'])->name('task.store');
-Route::put('/tasks/{task}', [TaskController::class, 'update'])->name('task.update');
-Route::delete('/tasks/{task}', [TaskController::class, 'destroy'])->name('task.destroy');
-//Route::get('/tasks-list', [TaskController::class, 'index'])->name('task.index');
-Route::get('/getTasksList/{project}', [TaskController::class, 'getTasksList'])->name('getTasksList');
 
-// Task_time_logs
-Route::post('/start-task/{task}/{action}', [TaskTimeLogController::class, 'actionTaskLog'])->name('task.action');
+    Route::post('/project', [ProjectController::class, 'store'])->name('project.store');
+    Route::get('/projects', [ProjectController::class, 'index'])->name('project.list');
+    Route::get('getProjectList', [ProjectController::class, 'getListProjects'])->name('getProjectList');
 
-Route::post('/project', [ProjectController::class, 'store'])->name('project.store');
-Route::get('/projects', [ProjectController::class, 'index'])->name('project.list');
-Route::get('getProjectList', [ProjectController::class, 'getListProjects'])->name('getProjectList');
+    Route::post('/tasks', [TaskController::class, 'store'])->name('task.store');
+    Route::put('/tasks/{task}', [TaskController::class, 'update'])->name('task.update');
+    Route::delete('/tasks/{task}', [TaskController::class, 'destroy'])->name('task.destroy');
+    //Route::get('/tasks-list', [TaskController::class, 'index'])->name('task.index');
+    Route::get('/getTasksList/{project}', [TaskController::class, 'getTasksList'])->name('getTasksList');
 
-// Sprints
-Route::post('/sprint', [SprintController::class, 'store'])->name('sprint.store');
-Route::get('getSprintList', [SprintController::class, 'getListSprints'])->name('getSprintList');
-//
-Route::get('/projects/{project?}', [ProjectController::class, 'show'])->name('project.show');
-Route::get('/projects/{project}/tasks', [ProjectController::class, 'projectTasks'])->name('project.tasks');
-Route::get('/projects/{project}/stats', [ProjectController::class, 'projectStats'])->name('project.stats');
-Route::get('/projects/{project}/goals', [ProjectController::class, 'projectGoals'])->name('project.goals');
+    // Task_time_logs
+    Route::post('/start-task/{task}/{action}', [TaskTimeLogController::class, 'actionTaskLog'])->name('task.action');
 
-Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+
+
+    // Sprints
+    Route::post('/sprint', [SprintController::class, 'store'])->name('sprint.store');
+    Route::get('getSprintList', [SprintController::class, 'getListSprints'])->name('getSprintList');
+    //
+    Route::get('/projects/{project?}', [ProjectController::class, 'show'])->name('project.show');
+    Route::get('/projects/{project}/tasks', [ProjectController::class, 'projectTasks'])->name('project.tasks');
+    Route::get('/projects/{project}/stats', [ProjectController::class, 'projectStats'])->name('project.stats');
+    Route::get('/projects/{project}/goals', [ProjectController::class, 'projectGoals'])->name('project.goals');
+
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+

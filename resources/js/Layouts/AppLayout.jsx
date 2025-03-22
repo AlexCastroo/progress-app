@@ -2,6 +2,10 @@ import React, { useEffect } from 'react';
 import DashboardList from '@/Components/DashboardList';
 import { Grid } from '@mui/material';
 import { useThemeContext } from '../Theme/ThemeContext'; // Importar el hook useThemeContext
+import { useForm } from '@inertiajs/react';
+import { router } from '@inertiajs/react';
+
+
 
 function AppLayout({ children, project }) {
     const { toggleTheme } = useThemeContext(); // Obtener la función para cambiar el tema
@@ -9,6 +13,17 @@ function AppLayout({ children, project }) {
     useEffect(() => {
         console.log("App Layout EFECT => ", children);
     }, [children]);
+
+    const { post } = useForm();
+    const handleLogout = () => {
+        router.post('/logout', {}, {
+            onSuccess: () =>  {
+                Inertia.visit('/login', { method: 'get' });
+                console.log('Logout successful');
+            },
+            onError: (errors) => console.error('Error en logout:', errors),
+        });
+    }
 
     return (
         <html lang="en" className="h-full">
@@ -26,6 +41,12 @@ function AppLayout({ children, project }) {
                                 <h1 className="text-2xl font-bold">My Total App</h1>
                                 <h5 className="text-xs font-light">Created by Alex Castro</h5>
                             </div>
+                            <button
+                                onClick={() => handleLogout()}
+                                className="bg-red-500 text-white px-4 py-2 rounded focus:outline-none"
+                            >
+                                Logout
+                            </button>
                             {/* Botón para cambiar el tema */}
                             <button
                                 onClick={toggleTheme}
