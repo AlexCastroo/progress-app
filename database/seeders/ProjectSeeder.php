@@ -9,6 +9,7 @@ use App\Models\Sprint;
 use App\Models\Task;
 use Faker\Generator as Faker;
 use Illuminate\Support\Facades\DB;
+use App\Models\User;
 
 class ProjectSeeder extends Seeder
 {
@@ -19,7 +20,11 @@ class ProjectSeeder extends Seeder
     {
         $faker = \Faker\Factory::create();
 
-        $projects = Project::factory()->count(3)->create();
+        $user = User::factory()->create([
+            'name' => 'User Test',
+            'email' => 'test@gmail.com',
+        ]);
+        $projects = Project::factory()->count(3)->create(['user_id' => $user->id]);
 
         foreach($projects as $project){
             $sprints = Sprint::factory()->count(3)->create([

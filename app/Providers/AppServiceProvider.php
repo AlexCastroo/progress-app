@@ -25,9 +25,12 @@ class AppServiceProvider extends ServiceProvider
     {
         VerifyEmail::toMailUsing(function (object $notifiable, string $url) {
             $parts = parse_url($url);
-            $verifyEmailUrl = 'http://localhost:5173/verify-email?id='
+            $verifyEmailUrl = 'http://localhost:8000/verify-email?id='
                 . $notifiable->getKey() . '&hash=' . sha1($notifiable->getEmailForVerification())
                 . '&' . $parts['query'];
+            // $verifyEmailUrl = 'http://localhost:5173/verify-email?id='
+            //     . $notifiable->getKey() . '&hash=' . sha1($notifiable->getEmailForVerification())
+            //     . '&' . $parts['query'];
 
             return (new MailMessage)
                 ->subject('Verify Email Address')

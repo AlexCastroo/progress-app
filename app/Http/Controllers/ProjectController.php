@@ -7,6 +7,7 @@ use App\Models\Task;
 use App\Http\Requests\StoreProjectRequest;
 use App\Http\Requests\UpdateProjectRequest;
 use Inertia\Inertia;
+use Illuminate\Http\Request;
 
 class ProjectController extends Controller
 {
@@ -16,7 +17,6 @@ class ProjectController extends Controller
     public function index()
     {
         $listProjects = Project::all();
-
         $motivationalQuotes = json_decode(file_get_contents(resource_path('data/motivational.json')), true);
         $randomQuote = $motivationalQuotes[array_rand($motivationalQuotes)];
 
@@ -82,7 +82,9 @@ class ProjectController extends Controller
 
     public function getListProjects(Project $project)
     {
-        $projectList = $project->all();
+        $user = auth()->user();
+        dd($user);
+        $projectList = $user->projects();
         return response()->json($projectList);
     }
 

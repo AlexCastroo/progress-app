@@ -10,89 +10,171 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Validation\ValidationException;
+use Inertia\Inertia;
+use App\Models\Project;
 
 
 class AuthController extends Controller
 {
     public function register (Request $request)
     {
-        $user = User::create($request->validate([
-            'name' => 'required|string',
-            'email' => 'required|email',
-            'password' => 'required|string|min:8'
-        ]));
+        try {
+            $user = User::create($request->validate([
+                'name' => 'required|string',
+                'email' => 'required|email',
+                'password' => 'required|string|min:8'
+            ]));
 
-        $user->sendEmailVerificationNotification();
+            $user->sendEmailVerificationNotification();
 
-        return response()->json([
-            'message' => 'User created successfully',
-            'user' => $user
-        ]);
+            return redirect()->route('login')->with([
+                'message' => 'User created successfully',
+                'user' => $user
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'An error occurred during registration. Please try again later.'
+            ], 500);
+        }
     }
 
     public function login(Request $request)
     {
-        $fields = $request->validate([
-            'email' => 'required|email',
-            'password' => 'required|string',
-            'remember' => 'boolean',
-        ]);
-
-        $credentials = [
-            'email' => $fields['email'],
-            'password' => $fields['password'],
-        ];
-
-        if(!Auth::attempt($credentials, $fields['remember'])) {
-            throw ValidationException::withMessages([
-                'email' => ['The provided credentials are incorrect.']
+        try {
+            $fields = $request->validate([
+                'email' => 'required|email',
+                'password' => 'required|string',
+                'remember' => 'boolean',
             ]);
+
+            $credentials = [
+                'email' => $fields['email'],
+                'password' => $fields['password'],
+            ];
+
+            if (!Auth::attempt($credentials, $fields['remember'] ?? false)) {
+                // Log the failed login attempt
+                \Log::warning('Login failed', [
+                    'email' => $fields['email'],
+                    'ip' => $request->ip(),
+                    'timestamp' => now(),
+                ]);
+
+                throw ValidationException::withMessages([
+                    'email' => ['The provided credentials are incorrect.']
+                ]);
+            }
+
+            // Regenerate session to prevent session fixation attacks
+            session()->regenerate();
+
+            // Log the successful login
+            \Log::info('Login successful', [
+                'user_id' => Auth::id(),
+                'email' => $fields['email'],
+                'ip' => $request->ip(),
+                'timestamp' => now(),
+            ]);
+
+
+            return redirect()->route('projects')->with([
+                'message' => 'Login successful',
+                'user' => Auth::user()
+            ]);
+
+        } catch (\Exception $e) {
+            // Log the exception details
+            \Log::error('An error occurred during login', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+                'ip' => $request->ip(),
+                'timestamp' => now(),
+            ]);
+
+            return response()->json([
+                'message' => 'An error occurred during login. Please try again later.'
+            ], 500);
         }
-
-        session()->regenerate();
-
-        return response()->json([
-            'message' => 'Login successful',
-            'user' => Auth::user()
-        ]);
     }
 
     public function logout()
     {
-        Auth::guard('web')->logout();
+        try{
+            $user = Auth::user();
 
-        return response(status: 204)->json([
-            'message' => 'Logged out'
-        ]);
+            Auth::guard('web')->logout();
+
+            // Log the successful logout
+            \Log::info('Logout successful', [
+                'user_id' => $user->id,
+                'email' => $user->email,
+                'ip' => request()->ip(),
+                'timestamp' => now(),
+            ]);
+
+            return redirect()->route('login');
+
+        } catch (\Exception $e) {
+            // Log the exception details
+            \Log::error('An error occurred during logout', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+                'ip' => request()->ip(),
+                'timestamp' => now(),
+            ]);
+        }
     }
 
     public function emailVerify($user_id, Request $request)
     {
-        if (!$request->hasValidSignature()) {
-            return response()->json([
-                'message' => 'Invalid/Expired URL provided'
-            ], 401);
-        }
+        try{
+            if (!$request->hasValidSignature()) {
+                return response()->json([
+                    'message' => 'Invalid/Expired URL provided'
+                ], 401);
+            }
 
-        $user = User::findOrFail($user_id);
+            $user = User::findOrFail($user_id);
 
-        if(!$user) {
-            return response()->json([
-                'message' => 'User not found'
-            ], 400);
-        }
+            if(!$user) {
+                return response()->json([
+                    'message' => 'User not found'
+                ], 400);
+            }
 
-        if(!$user->hasVerifiedEmail()) {
-            $user->markEmailAsVerified();
-            return response()->json([
+            if(!$user->hasVerifiedEmail()) {
+                $user->markEmailAsVerified();
+                return response()->json([
+                    'message' => 'Email verified',
+                    'user' => $user
+                ]);
+            }
+
+            \Log::info("message", [
                 'message' => 'Email verified',
-                'user' => $user
+                'user_id' => $user->id,
+                'email' => $user->email,
+                'timestamp' => now(),
             ]);
+            return response()->json([
+                'message' => 'Email already verified'
+            ], 400);
+        } catch (\Exception $e) {
+            // Log the exception details
+            \Log::error('An error occurred during email verification', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+                'ip' => request()->ip(),
+                'timestamp' => now(),
+            ]);
+
+            return response()->json([
+                'message' => 'An error occurred during email verification. Please try again later.'
+            ], 500);
         }
 
-        return response()->json([
-            'message' => 'Email already verified'
-        ], 400);
+
     }
 
     public function resendEmailVerificationMail(Request $request)

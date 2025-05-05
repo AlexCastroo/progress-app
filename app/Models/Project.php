@@ -11,6 +11,7 @@ class Project extends Model
     use HasFactory;
     protected $fillable = [
         'name',
+        'user_id',
         'description',
         'start_date',
         'end_date',
@@ -25,5 +26,10 @@ class Project extends Model
     public function sprints()
     {
         return $this->hasMany(Sprint::class);
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
     }
 }

@@ -4,7 +4,8 @@ import { Grid } from '@mui/material';
 import { useThemeContext } from '../Theme/ThemeContext'; // Importar el hook useThemeContext
 import { useForm } from '@inertiajs/react';
 import { router } from '@inertiajs/react';
-
+import axios from 'axios';
+import { Inertia } from '@inertiajs/inertia';
 
 
 function AppLayout({ children, project }) {
@@ -14,15 +15,16 @@ function AppLayout({ children, project }) {
         console.log("App Layout EFECT => ", children);
     }, [children]);
 
-    const { post } = useForm();
+    const { data, post } = useForm();
     const handleLogout = () => {
-        router.post('/logout', {}, {
-            onSuccess: () =>  {
-                Inertia.visit('/login', { method: 'get' });
-                console.log('Logout successful');
-            },
-            onError: (errors) => console.error('Error en logout:', errors),
-        });
+        axios.post('/api/logout')
+            .then((response) => {
+                console.log('User logged out successfully', response.data);
+                Inertia.visit('login');
+            })
+            .catch((error) => {
+                console.log('Error => ', error.response?.data || error.message);
+            });
     }
 
     return (

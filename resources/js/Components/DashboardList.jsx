@@ -21,6 +21,8 @@ import MilitaryTechRoundedIcon from '@mui/icons-material/MilitaryTechRounded';
 import WebAssetRoundedIcon from '@mui/icons-material/WebAssetRounded';
 import TableChartRoundedIcon from '@mui/icons-material/TableChartRounded';
 import { Inertia } from '@inertiajs/inertia';
+import axios from 'axios';
+
 
 export default function DashboardList({ project }) {
   const [open, setOpen] = React.useState(true);
@@ -41,7 +43,7 @@ export default function DashboardList({ project }) {
         </ListSubheader>
       }
     >
-      <ListItemButton onClick={() => Inertia.visit(route('project.list')) } >
+    <ListItemButton onClick={() => axios.get(route('project.list'))} >
         <ListItemIcon>
           <WebAssetRoundedIcon />
         </ListItemIcon>
